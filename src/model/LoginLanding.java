@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import database.LogDAO;
 import database.UserDAO;
 
 /**
@@ -33,9 +34,19 @@ public class LoginLanding extends HttpServlet {
 		// TODO Auto-generated method stub
 		
 		HttpSession session = request.getSession();
+		LogDAO logDAO = new LogDAO();
+		String remoteAddress = request.getRemoteAddr();
+	    String forwardedFor = request.getHeader("X-Forwarded-For");
+	    String realIP = request.getHeader("X-Real-IP"); // This is the header which should be used to check the IP address range.
+
+	    if( realIP == null )
+	    	realIP = forwardedFor;
+	    if( realIP == null )
+	        realIP = remoteAddress;
 		
 		if(session.getAttribute("user") == null) {
 			response.sendRedirect("login");
+			logDAO.addLog("Invading login landing page", realIP);
 		}
 		else {
 			UserDAO userDAO = new UserDAO();

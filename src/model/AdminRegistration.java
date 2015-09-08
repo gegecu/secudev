@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import utility.DateParser;
+import database.LogDAO;
 import database.UserDAO;
 
 /**
@@ -61,8 +62,20 @@ public class AdminRegistration extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
+		LogDAO logDAO = new LogDAO();
+		String remoteAddress = request.getRemoteAddr();
+	    String forwardedFor = request.getHeader("X-Forwarded-For");
+	    String realIP = request.getHeader("X-Real-IP"); // This is the header which should be used to check the IP address range.
+
+	    if( realIP == null )
+	    	realIP = forwardedFor;
+	    if( realIP == null )
+	        realIP = remoteAddress;
+		
 		if(request.getSession().getAttribute("user") == null || !((User)request.getSession().getAttribute("user")).isAdmin()) {
+			logDAO.addLog("Invading Admin Page", realIP);
 			response.sendRedirect("login_landing");
+			
 		}
 		else {
 		
@@ -160,6 +173,7 @@ public class AdminRegistration extends HttpServlet {
 			if(invalid) {
 				session.setAttribute(this.prompt, prompt);
 				session.setAttribute(this.status, false);
+				logDAO.addLog(prompt, realIP);
 				response.sendRedirect("admin_registration");
 			} else {
 				User user = new User();
@@ -178,9 +192,9 @@ public class AdminRegistration extends HttpServlet {
 					user.setAdmin(true);
 				}
 				
-				UserDAO userdao = new UserDAO();
+				UserDAO userDAO = new UserDAO();
 				
-				if(userdao.register(user)) {
+				if(userDAO.register(user)) {
 					session.setAttribute(this.status, true);
 				} else {
 					session.setAttribute(this.status, false);

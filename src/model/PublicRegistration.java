@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import database.LogDAO;
 import database.UserDAO;
 import utility.DateParser;
 
@@ -64,6 +65,15 @@ public class PublicRegistration extends HttpServlet {
 		//ServletContext sc = request.getServletContext();
 		
 		HttpSession session = request.getSession();
+		LogDAO logDAO = new LogDAO();
+		String remoteAddress = request.getRemoteAddr();
+	    String forwardedFor = request.getHeader("X-Forwarded-For");
+	    String realIP = request.getHeader("X-Real-IP"); // This is the header which should be used to check the IP address range.
+
+	    if( realIP == null )
+	    	realIP = forwardedFor;
+	    if( realIP == null )
+	        realIP = remoteAddress;
 		
 		String firstname = request.getParameter("firstname");
 		String lastname = request.getParameter("lastname");
@@ -149,6 +159,7 @@ public class PublicRegistration extends HttpServlet {
 		if(invalid) {
 			session.setAttribute(this.prompt, prompt);
 			session.setAttribute(this.status, false);
+			logDAO.addLog(prompt + "-Public Registration", realIP);
 			response.sendRedirect("public_registration");
 		} else {
 			User user = new User();
@@ -161,9 +172,8 @@ public class PublicRegistration extends HttpServlet {
 			user.setInfo("username", username);
 			user.setInfo("password", password);
 			
-			UserDAO userdao = new UserDAO();
-			
-			if(userdao.register(user)) {
+			UserDAO userDAO = new UserDAO();
+			if(userDAO.register(user)) {
 				session.setAttribute(this.status, true);
 			} else {
 				session.setAttribute(this.status, false);

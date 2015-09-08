@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.nashorn.internal.ir.RuntimeNode.Request;
 import model.Constant;
 import model.User;
 
@@ -64,6 +65,7 @@ public class UserDAO extends DAO{
 		   result = false;
 		} catch (ClassNotFoundException e) {
 		   e.printStackTrace();
+		   result = false;
 		}finally {
 			try {
 				if(stmt != null)
