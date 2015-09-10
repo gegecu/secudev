@@ -35,4 +35,17 @@ public class DateParser {
 		
 	}
 	
+	public static String parseDateForDisplay(String param_date) {
+		DateFormat output = new SimpleDateFormat("MM/dd/yyyy");
+		DateFormat input = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = new Date();
+		try {
+			date = input.parse(param_date);
+			return output.format(date);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 }

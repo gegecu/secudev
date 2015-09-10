@@ -3,10 +3,7 @@ package model;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Calendar;
-import java.util.Date;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import database.LogDAO;
 import database.UserDAO;
 import utility.DateParser;
+import utility.IPChecker;
 
 /**
  * Servlet implementation class public_registration
@@ -24,8 +22,8 @@ import utility.DateParser;
 @WebServlet("/public_registration")
 public class PublicRegistration extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	public static final String prompt = "prompt";
-	public static final String status = "status";
+	private final String prompt = "prompt";
+	private final String status = "status";
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -65,15 +63,6 @@ public class PublicRegistration extends HttpServlet {
 		//ServletContext sc = request.getServletContext();
 		
 		HttpSession session = request.getSession();
-		LogDAO logDAO = new LogDAO();
-		String remoteAddress = request.getRemoteAddr();
-	    String forwardedFor = request.getHeader("X-Forwarded-For");
-	    String realIP = request.getHeader("X-Real-IP"); // This is the header which should be used to check the IP address range.
-
-	    if( realIP == null )
-	    	realIP = forwardedFor;
-	    if( realIP == null )
-	        realIP = remoteAddress;
 		
 		String firstname = request.getParameter("firstname");
 		String lastname = request.getParameter("lastname");
@@ -90,6 +79,9 @@ public class PublicRegistration extends HttpServlet {
 		if(firstname.length()==0){
 			prompt += "First name is empty. ";
 			invalid = true;
+		} else if (firstname.length() > 50) {
+			prompt += "First name is over 50 characters. ";
+			invalid = true;
 		} else if(!(firstname.matches("^[A-Za-z\\s]{1,}[A-Za-z\\s]{0,}$"))) {
 			prompt += "First name contains special character. ";
 			invalid = true;
@@ -98,6 +90,9 @@ public class PublicRegistration extends HttpServlet {
 		
 		if(lastname.length()==0){
 			prompt += "Last name is empty. ";
+			invalid = true;
+		} else if(lastname.length() > 50) {
+			prompt += "Last name is over 50 characters. ";
 			invalid = true;
 		} else if(!(lastname.matches("^[A-Za-z\\s]{1,}[A-Za-z\\s]{0,}$"))) {
 			prompt += "Last name contains special character. ";
@@ -144,6 +139,9 @@ public class PublicRegistration extends HttpServlet {
 		if(username.length()==0) {
 			prompt += "Username is empty. ";
 			invalid = true;
+		} else if(username.length() > 50) {
+			prompt += "Username is over 50 characters. ";
+			invalid = true;
 		} else if (!(username.matches("^[a-zA-Z0-9_]*$"))) {
 			prompt += "Username contains special character. ";
 			invalid = true;
@@ -153,13 +151,16 @@ public class PublicRegistration extends HttpServlet {
 		if(password.length()==0) {
 			prompt += "Password is empty. ";
 			invalid = true;
-		} 
+		} else if(password.length() > 50) {
+			prompt += "Password is over 50 characters. ";
+			invalid = true;
+		}
 		
 		
 		if(invalid) {
 			session.setAttribute(this.prompt, prompt);
 			session.setAttribute(this.status, false);
-			logDAO.addLog(prompt + "-Public Registration", realIP);
+			LogDAO.addLog(prompt + "-Public Registration", IPChecker.getClientIpAddress(request));
 			response.sendRedirect("public_registration");
 		} else {
 			User user = new User();
@@ -172,8 +173,7 @@ public class PublicRegistration extends HttpServlet {
 			user.setInfo("username", username);
 			user.setInfo("password", password);
 			
-			UserDAO userDAO = new UserDAO();
-			if(userDAO.register(user)) {
+			if(UserDAO.register(user)) {
 				session.setAttribute(this.status, true);
 			} else {
 				session.setAttribute(this.status, false);

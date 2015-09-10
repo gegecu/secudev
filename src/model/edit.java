@@ -17,10 +17,10 @@ import database.LogDAO;
 import database.UserDAO;
 
 /**
- * Servlet implementation class AdminRegistration
+ * Servlet implementation class edit
  */
-@WebServlet("/admin_registration")
-public class AdminRegistration extends HttpServlet {
+@WebServlet("/edit")
+public class edit extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final String prompt = "prompt";
 	private final String status = "status";
@@ -28,7 +28,7 @@ public class AdminRegistration extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public AdminRegistration() {
+    public edit() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -39,21 +39,21 @@ public class AdminRegistration extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		HttpSession session = request.getSession();
+		User user = (User)session.getAttribute("user");
 		
-		if(session.getAttribute("user") == null || !((User)session.getAttribute("user")).isAdmin()) {
-			//request.getSession().invalidate();
-			LogDAO.addLog("Invading Admin Page", IPChecker.getClientIpAddress(request));
-			response.sendRedirect("login_landing");
-		}
-		
-		else {
+		if(user == null) {
+			LogDAO.addLog("Invading Edit Page", IPChecker.getClientIpAddress(request));
+			response.sendRedirect("login");
+		} else {
+			request.setAttribute("user", user);
+			
 			request.setAttribute(this.prompt, session.getAttribute(this.prompt));
 			session.removeAttribute(this.prompt);
 			
 			request.setAttribute(this.status, session.getAttribute(this.status));
 			session.removeAttribute(this.status);
 			
-			request.getRequestDispatcher("admin_registration.jsp").forward(request, response);
+			request.getRequestDispatcher("edit.jsp").forward(request, response);
 		}
 	}
 
@@ -62,16 +62,10 @@ public class AdminRegistration extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		HttpSession session = request.getSession();
+		//User user = (User)session.getAttribute("user");
 		
-		if(request.getSession().getAttribute("user") == null || !((User)request.getSession().getAttribute("user")).isAdmin()) {
-			LogDAO.addLog("Invading Admin Page", IPChecker.getClientIpAddress(request));
-			response.sendRedirect("login_landing");
-			
-		}
-		else {
-		
-			HttpSession session = request.getSession();
-			
+		if(session.getAttribute("user") != null) {
 			String firstname = request.getParameter("firstname");
 			String lastname = request.getParameter("lastname");
 			String sex = request.getParameter("sex");
@@ -81,17 +75,17 @@ public class AdminRegistration extends HttpServlet {
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			String access = request.getParameter("access");
-			
 			String prompt = "";
 			boolean invalid = false;
 			
 			if(firstname.length()==0){
 				prompt += "First name is empty. ";
 				invalid = true;
-			} else if (firstname.length() > 50) {
+			} else if(firstname.length() > 50) {
 				prompt += "First name is over 50 characters. ";
 				invalid = true;
-			} else if(!(firstname.matches("^[A-Za-z\\s]{1,}[A-Za-z\\s]{0,}$"))) {
+			}
+			else if(!(firstname.matches("^[A-Za-z\\s]{1,}[A-Za-z\\s]{0,}$"))) {
 				prompt += "First name contains special character. ";
 				invalid = true;
 			} 
@@ -145,16 +139,10 @@ public class AdminRegistration extends HttpServlet {
 			} 
 			
 			
-			if(username.length()==0) {
-				prompt += "Username is empty. ";
+			if(!username.equals(((User)session.getAttribute("user")).getInfo("username"))) {
+				prompt += "Username cannot be edited. ";
 				invalid = true;
-			} else if(username.length() > 50) {
-				prompt += "Username is over 50 characters. ";
-				invalid = true;
-			} else if (!(username.matches("^[a-zA-Z0-9_]*$"))) {
-				prompt += "Username contains special character. ";
-				invalid = true;
-			} 
+			}
 			
 			
 			if(password.length()==0) {
@@ -165,19 +153,24 @@ public class AdminRegistration extends HttpServlet {
 				invalid = true;
 			}
 			
-			if(access == null || access.length() == 0) {
+			if(((User)session.getAttribute("user")).isAdmin() && (access == null || access.length() == 0)) {
 				prompt += "No access type. ";
 				invalid = true;
-			} else if(!(access.equals("Admin") || access.equals("User"))) {
+			} else if(!((User)session.getAttribute("user")).isAdmin() && access != null) {
+				prompt += "Not authorized to set access type. ";
+				invalid = true;
+			}
+			else if(!(access.equals("Admin") || access.equals("User"))) {
 				prompt += "Unknown access type. ";
 				invalid = true;
 			}
 			
+			
 			if(invalid) {
 				session.setAttribute(this.prompt, prompt);
 				session.setAttribute(this.status, false);
-				LogDAO.addLog(prompt, IPChecker.getClientIpAddress(request));
-				response.sendRedirect("admin_registration");
+				LogDAO.addLog(prompt + "-Edit", IPChecker.getClientIpAddress(request));
+				response.sendRedirect("edit");
 			} else {
 				User user = new User();
 				user.setInfo("firstname", firstname);
@@ -191,19 +184,24 @@ public class AdminRegistration extends HttpServlet {
 				
 				if(access.equals("User")) {
 					user.setAdmin(false);
-				} else {
+				} else if(access.equals("Admin")) {
 					user.setAdmin(true);
 				}
 				
-				
-				if(UserDAO.register(user)) {
+				if(UserDAO.edit(user)) {
+					user.setInfo("birthday", DateParser.parseDateForDisplay(birthdate.toString()));
+					session.setAttribute("user", user);
 					session.setAttribute(this.status, true);
 				} else {
 					session.setAttribute(this.status, false);
 				}
 				
-				response.sendRedirect("admin_registration");
+				response.sendRedirect("edit");
 			}
+		}
+		else {
+			LogDAO.addLog("Invading Edit Page", IPChecker.getClientIpAddress(request));
+			response.sendRedirect("login");
 		}
 	}
 

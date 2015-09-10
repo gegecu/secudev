@@ -1,11 +1,16 @@
 package database;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
 
 public class LogDAO extends DAO{
 	
-	public void addLog(String description, String ipAddress) {
+	public static void addLog(String description, String ipAddress) {
 		String query = "INSERT INTO `secudev`.`log` (`loginfo`, `ipaddress`) VALUES (?, ?)";
+		Connection connection = null;
+		PreparedStatement stmt = null;
 		
 		System.out.println(query);
 		try {

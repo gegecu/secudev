@@ -14,27 +14,21 @@ table, th, td {
 </head>
 <body>
 	<div>
-		<table>
-			<c:forEach var="users" items="${users}" end="0">
-     			<tr>
-     				<c:forEach var="entry" items="${users.getMap()}">
-						<th>${entry.getKey()}</th>
-					</c:forEach>
-     			</tr>
-			</c:forEach>
-			<c:forEach var="users" items="${users}">
-				<tr>
-					<c:forEach var="entry" items="${users.getMap()}">
-						<td>${users.getInfo(entry.getKey())}</td>
-					</c:forEach>
-				</tr>
-			</c:forEach>
-		</table>
+		Firstname: ${user.getInfo("firstname")} <br>
+		Lastname: ${user.getInfo("lastname")} <br>
+		Gender: ${user.getInfo("sex")} <br>
+		Salutation: ${user.getInfo("salutation")} <br>
+		Birthdate: ${user.getInfo("birthday")} <br>
+		Username: ${user.getInfo("username")} <br>
+		About Me: ${user.getInfo("description")} <br>
 	</div>
 	
 	<c:if test="${user.isAdmin()==true}">
-		<a href=admin_registration>Admin Registration</a>
+		<a href=admin_registration>admin registration</a>
 	</c:if>
+	
+	<a href=edit>edit profile</a>
+
 	
 	<c:if test="${user!=null}">
 		<form action="logout" method="GET">

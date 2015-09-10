@@ -1,17 +1,18 @@
 package database;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.nashorn.internal.ir.RuntimeNode.Request;
 import model.Constant;
 import model.User;
 
 public class UserDAO extends DAO{
 
-	public boolean register(User user) {
+	public static boolean register(User user) {
 		
 		boolean result = true;
 		String query1 = "";
@@ -33,10 +34,13 @@ public class UserDAO extends DAO{
 			
 		}
 		
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		PreparedStatement stmt2 = null;
 		try {
-			connection = getConnection();
+			connection  = getConnection();
 			connection.setAutoCommit(false);
-			stmt = connection.prepareStatement(query1);
+			stmt  = connection.prepareStatement(query1);
 			
 			stmt.setString(1, user.getInfo("firstname"));
 			stmt.setString(2, user.getInfo("lastname"));
@@ -51,11 +55,11 @@ public class UserDAO extends DAO{
 			
 			if(!query2.isEmpty()) {
 			
-			stmt = connection.prepareStatement(query2);
+			stmt2 = connection.prepareStatement(query2);
 			
-			stmt.setString(1, user.getInfo("username"));
+			stmt2.setString(1, user.getInfo("username"));
 
-			stmt.executeUpdate();
+			stmt2.executeUpdate();
 			}
 			
 			connection.commit();
@@ -70,6 +74,8 @@ public class UserDAO extends DAO{
 			try {
 				if(stmt != null)
 					stmt.close();
+				if(stmt2 != null)
+					stmt2.close();
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
@@ -80,7 +86,76 @@ public class UserDAO extends DAO{
 		return result;		
 	}
 	
-	public User login(String username, String password) {
+	public static boolean edit(User user) {
+		
+		boolean result = true;
+		String query1 = "";
+		String query2 = "";
+		
+		query1 = "UPDATE " + Constant.UserTable.table + " SET " + Constant.UserTable.firstname + " = ?," + Constant.UserTable.lastname + " = ?," 
+				+ Constant.UserTable.sex + " = (SELECT " + Constant.SexTable.sexid + " FROM " + Constant.SexTable.table + " WHERE " + Constant.SexTable.name
+				+ " = ? ), " + Constant.UserTable.description + " = ?," + Constant.UserTable.salutation + " = " + "(SELECT " + Constant.SalutationTable.salutationid + " FROM " + Constant.SalutationTable.table + " WHERE " + Constant.SalutationTable.name
+				+ " = ? )," + Constant.UserTable.birthday + " = ?," + Constant.UserTable.password + " = sha2(?, 256) WHERE " + Constant.UserTable.username + " = ?"; 
+		
+		
+		System.out.println(query1);
+		
+		if(!user.isAdmin()) {
+			query2 = " DELETE FROM " + Constant.AdminTable.table + " WHERE " + Constant.AdminTable.username + " = ?";
+		}
+		
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		PreparedStatement stmt2 = null;
+		try {
+			connection  = getConnection();
+			connection.setAutoCommit(false);
+			stmt  = connection.prepareStatement(query1);
+			stmt.setString(1, user.getInfo("firstname"));
+			stmt.setString(2, user.getInfo("lastname"));
+			stmt.setString(3, user.getInfo("sex"));
+			stmt.setString(4, user.getInfo("description"));
+			stmt.setString(5, user.getInfo("salutation"));
+			stmt.setString(6, user.getInfo("birthday"));
+			stmt.setString(8, user.getInfo("username"));
+			stmt.setString(7, user.getInfo("password"));
+
+			stmt.executeUpdate();
+			
+			if(!query2.isEmpty()) {
+			
+			stmt2 = connection.prepareStatement(query2);
+			
+			stmt2.setString(1, user.getInfo("username"));
+
+			stmt2.executeUpdate();
+			}
+			
+			connection.commit();
+			
+		} catch (SQLException e) {
+		   e.printStackTrace();
+		   result = false;
+		} catch (ClassNotFoundException e) {
+		   e.printStackTrace();
+		   result = false;
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(stmt2 != null)
+					stmt2.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;		
+	}
+	
+	public static User login(String username, String password) {
 		
 		User user = null;
 
@@ -94,10 +169,12 @@ public class UserDAO extends DAO{
 					   Constant.UserTable.password + " = " + "SHA2(" + "?" + ", 256)";
 		
 		System.out.println(query);
+		Connection connection = null;
+		PreparedStatement stmt = null;
 		try {
 			
-			connection = getConnection();
-			stmt = connection.prepareStatement(query);
+			connection  = getConnection();
+			stmt  = connection.prepareStatement(query);
 			stmt.setString(1, username);
 			stmt.setString(2, password);
 			ResultSet rs = stmt.executeQuery();
@@ -111,7 +188,6 @@ public class UserDAO extends DAO{
 				user.setInfo("salutation", rs.getString(5));
 				user.setInfo("birthday", rs.getString(6));
 				user.setInfo("username", rs.getString(7));
-				user.setInfo("password", rs.getString(8));
 				
 				if(rs.getInt(9) == 1) {
 					user.setAdmin(true);
@@ -140,7 +216,7 @@ public class UserDAO extends DAO{
 		return user;
 	}
 	
-	public List<User> getAllUser() {
+	public static List<User> getAllUser() {
 		
 		List<User> users = new ArrayList<User>();
 		
@@ -152,10 +228,12 @@ public class UserDAO extends DAO{
 				   Constant.SexTable.table + " ON " + Constant.UserTable.sex + " = " + Constant.SexTable.sexid;
 		
 		System.out.println(query);
+		Connection connection = null;
+		PreparedStatement stmt = null;
 		try {
 			
-			connection = getConnection();
-			stmt = connection.prepareStatement(query);
+			connection  = getConnection();
+			stmt  = connection.prepareStatement(query);
 			ResultSet rs = stmt.executeQuery();
 			
 			while(rs.next()){

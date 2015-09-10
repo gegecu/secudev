@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="model.User" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -8,9 +9,8 @@
 <title>Insert title here</title>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="/resources/demos/style.css">
-
 </head>
 <body>
 	<div>
@@ -18,11 +18,11 @@
 			<c:choose>
 				<c:when test="${status==true}">
 					<script>
-						alert("Registration Successful");
+						alert("Edit Successful");
 					</script>
 				</c:when>
 				<c:when test="${status==false}">
-					Registation Failed. <br>
+					Edit Failed. <br>
 					${prompt}
 				</c:when>
 			</c:choose>	
@@ -30,7 +30,7 @@
 	</div>
 
 	<div>
-		<form action="admin_registration" method="POST">
+		<form action="edit" method="POST">
 			
 			Firstname: <input id="firstname" name="firstname" type="text" required><br>
 			Lastname: <input id="lastname" name="lastname" type="text" required><br>
@@ -54,30 +54,26 @@
 				<input type="date" id="birthday" name="birthday" required> 
 			</div>
 			
-			Username: <input id="username" name="username" type="text" required><br>
+			Username: <input id="username" name="username" type="text" readonly><br>
 			Password: <input id="password" name="password" type="password" required><br> 
 			About me: <input id="description" name="description" type="text" required> <br>
 			
 			<div>
-			Access Type:
-				<select id="access" name="access" required>
-					<option value="User">User</option>
-					<option value="Admin">Admin</option>
-				</select>
+				<c:if test="${user.isAdmin()==true}">
+					Access Type:
+						<select id="access" name="access" required>
+							<option value="User">User</option>
+							<option value="Admin">Admin</option>
+						</select>
+				</c:if>
 			</div>
 			
 			<button type=submit>Submit</button>
 		</form>
 	</div>
 	
-	<c:if test="${user!=null}">
-		<form action="logout" method="GET">
-		<button type=submit>logout</button>
-		</form>
-	</c:if>
-	
-	<a href=login_landing>back</a>
-	
+	 <a href="login_landing">back</a> 
+	 
 </body>
 
 <script>
@@ -91,7 +87,47 @@
 			salutationTrigger();
 
 		});
+		
+		init();
 	});
+	
+	function init() {
+		
+		<%if((User)request.getAttribute("user") != null) {%>
+			var firstname = '${user.getInfo("firstname")}';
+			$("#firstname").val(firstname);
+			
+			var lastname = '${user.getInfo("lastname")}';
+			$("#lastname").val(lastname);
+			
+			var sex = '${user.getInfo("sex")}';
+			$("#sex").val(sex);
+			salutationTrigger();
+			
+			var salutation = '${user.getInfo("salutation")}';
+			$("#salutations").val(salutation);
+			
+			var birthday = '${user.getInfo("birthday")}';
+			$("#birthday").val(birthday);
+			
+			var username = '${user.getInfo("username")}';
+			$("#username").val(username);
+			
+			var password = '${user.getInfo("password")}';
+			$("#password").val(password);
+			
+			var description = '${user.getInfo("description")}';
+			$("#description").val(description);
+			
+			<%if(((User)request.getAttribute("user")).isAdmin()){%>
+				$("#access").val('Admin');
+			<%} else {%>
+				$("#access").val('User');
+			<%}%>
+			
+		<%}%>
+		
+	}
 	
 	function salutationTrigger() {
 		
