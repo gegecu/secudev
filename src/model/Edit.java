@@ -20,7 +20,7 @@ import database.UserDAO;
  * Servlet implementation class edit
  */
 @WebServlet("/edit")
-public class edit extends HttpServlet {
+public class Edit extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final String prompt = "prompt";
 	private final String status = "status";
@@ -28,7 +28,7 @@ public class edit extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public edit() {
+    public Edit() {
         super();
         // TODO Auto-generated constructor stub
     }

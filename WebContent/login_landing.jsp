@@ -13,6 +13,7 @@ table, th, td {
 <title>Insert title here</title>
 </head>
 <body>
+	
 	<div>
 		Firstname: ${user.getInfo("firstname")} <br>
 		Lastname: ${user.getInfo("lastname")} <br>
@@ -27,13 +28,21 @@ table, th, td {
 		<a href=admin_registration>admin registration</a>
 	</c:if>
 	
-	<a href=edit>edit profile</a>
-
-	
 	<c:if test="${user!=null}">
 		<form action="logout" method="GET">
 		<button type=submit>logout</button>
 		</form>
 	</c:if>
+	
+	<a href=edit>edit profile</a>
+
+	<br>
+	<form action="post" method="POST">
+		Post: <br>
+		<textarea id="post" name="post" type="text" rows="4" cols="50" required></textarea><br>
+		<button type=submit>Submit</button>
+	</form>
+	
+	
 </body>
 </html>
