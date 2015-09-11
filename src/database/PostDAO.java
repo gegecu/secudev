@@ -57,7 +57,7 @@ public class PostDAO extends DAO{
 		List<Post> posts = new ArrayList<Post>();
 		
 		String query = " SELECT SQL_CALC_FOUND_ROWS `post`.postid, `post`.post, `post`.username, `post`.postdate, `post`.editeddate, `user`.firstname, `user`.joindate FROM `post` INNER JOIN" +
-						" `user` ON `post`.username = `user`.username LIMIT " + offset + ", " + noOfRecords;
+						" `user` ON `post`.username = `user`.username" + " ORDER BY `post`.postdate LIMIT " + offset + ", " + noOfRecords;
 		
 		System.out.println(query);
 		Connection connection = null;
