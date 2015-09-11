@@ -64,7 +64,7 @@
 		</form>
 	</div>
 	
-	 <a href="login">login</a> 
+	 <button onclick="location.href='login'">login</button>
 	 
 </body>
 

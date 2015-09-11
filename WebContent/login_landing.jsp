@@ -19,7 +19,7 @@
 	</div>
 	
 	<c:if test="${sessionScope.user.isAdmin()==true}">
-		<a href=admin_registration>admin registration</a>
+		<button onclick="location.href='admin_registration'">admin registration</button>
 	</c:if>
 	
 	<c:if test="${sessionScope.user!=null}">
@@ -28,7 +28,7 @@
 		</form>
 	</c:if>
 	
-	<a href=edit>edit profile</a>
+	<button onclick="location.href='edit'">edit profile</button>
 
 	<br>
 	<br>
@@ -91,10 +91,11 @@
 		</table>
 		
 		<%--For displaying Previous link except for the 1st page --%>
+		<%-- 
 	    <c:if test="${currentPage > 1}">
 	        <td><a href="login_landing?page=${currentPage - 1}">Previous</a></td>
 	    </c:if>
-	 
+	 	--%>
 	    <%--For displaying Page numbers. 
 	    The when condition does not display a link for the current page--%>
 	    <table border="1" cellpadding="5" cellspacing="5">
@@ -113,9 +114,11 @@
 	    </table>
 	     
 	    <%--For displaying Next link --%>
+	    <%-- 
 	    <c:if test="${currentPage lt noOfPages}">
 	        <td><a href="login_landing?page=${currentPage + 1}">Next</a></td>
 	    </c:if>
+	    --%>
 	</div>
 	
 </body>
