@@ -59,7 +59,7 @@
 			About me: <input id="description" name="description" type="text" required> <br>
 			
 			<div>
-				<c:if test="${user.isAdmin()==true}">
+				<c:if test="${sessionScope.user.isAdmin()==true}">
 					Access Type:
 						<select id="access" name="access" required>
 							<option value="User">User</option>
@@ -94,29 +94,29 @@
 	function init() {
 		
 		<%if((User)request.getAttribute("user") != null) {%>
-			var firstname = '${user.getInfo("firstname")}';
+			var firstname = '${sessionScope.user.getInfo("firstname")}';
 			$("#firstname").val(firstname);
 			
-			var lastname = '${user.getInfo("lastname")}';
+			var lastname = '${sessionScope.user.getInfo("lastname")}';
 			$("#lastname").val(lastname);
 			
-			var sex = '${user.getInfo("sex")}';
+			var sex = '${sessionScope.user.getInfo("sex")}';
 			$("#sex").val(sex);
 			salutationTrigger();
 			
-			var salutation = '${user.getInfo("salutation")}';
+			var salutation = '${sessionScope.user.getInfo("salutation")}';
 			$("#salutations").val(salutation);
 			
-			var birthday = '${user.getInfo("birthday")}';
+			var birthday = '${sessionScope.user.getInfo("birthday")}';
 			$("#birthday").val(birthday);
 			
-			var username = '${user.getInfo("username")}';
+			var username = '${sessionScope.user.getInfo("username")}';
 			$("#username").val(username);
 			
-			var password = '${user.getInfo("password")}';
+			var password = '${sessionScope.user.getInfo("password")}';
 			$("#password").val(password);
 			
-			var description = '${user.getInfo("description")}';
+			var description = '${sessionScope.user.getInfo("description")}';
 			$("#description").val(description);
 			
 			<%if(((User)request.getAttribute("user")).isAdmin()){%>

@@ -70,7 +70,7 @@
 		</form>
 	</div>
 	
-	<c:if test="${user!=null}">
+	<c:if test="${sessionScope.user!=null}">
 		<form action="logout" method="GET">
 		<button type=submit>logout</button>
 		</form>

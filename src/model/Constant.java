@@ -12,6 +12,7 @@ public class Constant {
 		public static final String username = "`user`.username";
 		public static final String password = "`user`.password";
 		public static final String birthday = "`user`.birthdate";
+		public static final String joindate = "`user`.joindate";
 	}
 	
 	public class AdminTable {
