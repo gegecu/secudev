@@ -1,6 +1,8 @@
 package model;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -13,6 +15,8 @@ import javax.servlet.http.HttpSession;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
+import org.kefirsf.bb.BBProcessorFactory;
+import org.kefirsf.bb.TextProcessor;
 
 import utility.IPChecker;
 import database.LogDAO;
@@ -24,7 +28,9 @@ import database.PostDAO;
 @WebServlet("/login_landing")
 public class LoginLanding extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private final String prompt = "prompt";
 	private final String status = "status";
+	//private TextProcessor processor = BBProcessorFactory.getInstance().createFromResource("org/kefirsf/bb/safehtml.xml");
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -86,15 +92,38 @@ public class LoginLanding extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
+		String prompt = "";
+		boolean invalid = false;
+		
 		HttpSession session = request.getSession();
 		
 		if(session.getAttribute("user") != null) {
-			String post = Jsoup.clean(request.getParameter("post"), Whitelist.basicWithImages());
+			String post = Jsoup.clean(request.getParameter("post"), Whitelist.relaxed());
+			//String post = processor.process(request.getParameter("post"));
+			//System.out.println(post);
+			if(post.length() == 0) {
+				prompt = "Post is empty";
+				invalid = true;
+			} 
 			
-			if(PostDAO.addPost(post, (User)session.getAttribute("user"))) {
-				session.setAttribute(this.status, true);
-			} else {
+			if(invalid) {
+				session.setAttribute(this.prompt, prompt);
 				session.setAttribute(this.status, false);
+				LogDAO.addLog(prompt + "-Post", IPChecker.getClientIpAddress(request));
+				response.sendRedirect("login_landing");
+			} 
+			else {
+				Post p = new Post();
+				p.setInfo("post", post);
+				p.setInfo("postdate", new Date(Calendar.getInstance().getTime().getTime()).toString());
+				p.setInfo("username", ((User)session.getAttribute("user")).getInfo("username"));
+				if(PostDAO.addPost(p)) {
+					session.setAttribute(this.status, true);
+				} 
+				else {
+					session.setAttribute(this.status, false);
+				}
 			}
 			
 			response.sendRedirect("login_landing");

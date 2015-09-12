@@ -1,57 +1,33 @@
 package model;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Post {
-	private String post;
-	private String username;
-	private Date date;
-	private Date editDate;
-	private String firstname;
-	private Date userJoin;
-	private int postid;
+	private Map<String, String> info;
+	private int id;
 	
-	public int getPostid() {
-		return postid;
+	public Post() {
+		info = new HashMap<String, String>();
 	}
-	public void setPostid(int postid) {
-		this.postid = postid;
+	
+	public String getInfo(String key) {
+		return info.get(key);
 	}
-	public String getFirstname() {
-		return firstname;
+	
+	public Map<String, String> getMap() {
+		return info;
 	}
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
+	
+	public void setInfo(String key, String value) {
+		info.put(key, value);
 	}
-	public Date getUserJoin() {
-		return userJoin;
+	public int getId() {
+		return id;
 	}
-	public void setUserJoin(Date userJoin) {
-		this.userJoin = userJoin;
-	}
-	public String getPost() {
-		return post;
-	}
-	public void setPost(String post) {
-		this.post = post;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public Date getDate() {
-		return date;
-	}
-	public void setDate(Date date) {
-		this.date = date;
-	}
-	public Date getEditDate() {
-		return editDate;
-	}
-	public void setEditDate(Date editDate) {
-		this.editDate = editDate;
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	

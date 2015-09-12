@@ -15,7 +15,7 @@ import model.User;
 
 public class PostDAO extends DAO{
 
-	public static boolean addPost(String post, User user) {
+	public static boolean addPost(Post post) {
 		String query = "INSERT INTO `secudev`.`post` (`post`, `username`, `postdate`) VALUES (?, ?, ?)";
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -26,9 +26,9 @@ public class PostDAO extends DAO{
 			connection.setAutoCommit(false);
 			stmt = connection.prepareStatement(query);
 			
-			stmt.setString(1, post);
-			stmt.setString(2, user.getInfo("username"));
-			stmt.setDate(3, new Date(Calendar.getInstance().getTime().getTime()));
+			stmt.setString(1, post.getInfo("post"));
+			stmt.setString(2, post.getInfo("username"));
+			stmt.setString(3, post.getInfo("postdate"));
 
 			stmt.executeUpdate();
 			
@@ -57,7 +57,7 @@ public class PostDAO extends DAO{
 		List<Post> posts = new ArrayList<Post>();
 		
 		String query = " SELECT SQL_CALC_FOUND_ROWS `post`.postid, `post`.post, `post`.username, `post`.postdate, `post`.editeddate, `user`.firstname, `user`.joindate FROM `post` INNER JOIN" +
-						" `user` ON `post`.username = `user`.username" + " ORDER BY `post`.postdate LIMIT " + offset + ", " + noOfRecords;
+						" `user` ON `post`.username = `user`.username" + " ORDER BY `post`.postdate DESC LIMIT " + offset + ", " + noOfRecords;
 		
 		System.out.println(query);
 		Connection connection = null;
@@ -70,14 +70,13 @@ public class PostDAO extends DAO{
 			
 			while(rs.next()){
 				Post post = new Post();
-				post.setPostid(rs.getInt(1));
-				post.setPost(rs.getString(2));
-				post.setUsername(rs.getString(3));
-				post.setDate(rs.getDate(4));
-				post.setEditDate(rs.getDate(5));
-				post.setFirstname(rs.getString(6));
-				post.setUserJoin(rs.getDate(7));
-				
+				post.setId(rs.getInt(1));
+				post.setInfo("post", rs.getString(2));
+				post.setInfo("username", rs.getString(3));
+				post.setInfo("postdate", rs.getString(4));
+				post.setInfo("editdate", rs.getString(5));
+				post.setInfo("firstname", rs.getString(6));
+				post.setInfo("userjoin", rs.getString(7));
 				posts.add(post);
 			}
 			
@@ -104,6 +103,145 @@ public class PostDAO extends DAO{
 		}
 		
 		return posts;
+	}
+	
+	public static Post getPost(int id) {
+		
+		//List<Post> posts = new ArrayList<Post>();
+		Post post = null;
+		
+		String query = " SELECT `post`.postid, `post`.post, `post`.username, `post`.postdate, `post`.editeddate, `user`.firstname, `user`.joindate FROM `post` INNER JOIN" +
+						" `user` ON `post`.username = `user`.username WHERE `post`.postid = " + id;
+		
+		System.out.println(query);
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		try {
+			
+			connection  = getConnection();
+			stmt  = connection.prepareStatement(query);
+			ResultSet rs = stmt.executeQuery();
+			
+			if(rs.next()){
+				post = new Post();
+				post.setId(rs.getInt(1));
+				post.setInfo("post", rs.getString(2));
+				post.setInfo("username", rs.getString(3));
+				post.setInfo("postdate", rs.getString(4));
+				post.setInfo("editdate", rs.getString(5));
+				post.setInfo("firstname", rs.getString(6));
+				post.setInfo("userjoin", rs.getString(7));
+				
+			}
+			
+			rs.close();
+
+		} catch (SQLException e) {
+		   e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+		   e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return post;
+		
+	}
+	
+	public static boolean delete(int id) {
+		String query = "DELETE FROM `post` WHERE `post`.postid = ?";
+		
+		boolean result = true;
+		
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		PreparedStatement stmt2 = null;
+		try {
+			connection  = getConnection();
+			connection.setAutoCommit(false);
+			stmt  = connection.prepareStatement(query);
+			stmt.setInt(1, id);
+
+			stmt.executeUpdate();
+
+			connection.commit();
+			
+		} catch (SQLException e) {
+		   e.printStackTrace();
+		   result = false;
+		} catch (ClassNotFoundException e) {
+		   e.printStackTrace();
+		   result = false;
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(stmt2 != null)
+					stmt2.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;		
+		
+	}
+	
+	public static boolean editPost(Post post) {
+		
+		boolean result = true;
+		String query1 = "";
+		
+		query1 = "UPDATE `post` SET `post`.`post` = ?, `post`.editeddate = ? WHERE `post`.postid = ?";
+		
+		
+		System.out.println(query1);
+		
+		
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		PreparedStatement stmt2 = null;
+		try {
+			connection  = getConnection();
+			connection.setAutoCommit(false);
+			stmt  = connection.prepareStatement(query1);
+			stmt.setString(1, post.getInfo("post"));
+			stmt.setDate(2, new Date(Calendar.getInstance().getTime().getTime()));
+			stmt.setInt(3, post.getId());
+
+			stmt.executeUpdate();
+
+			connection.commit();
+			
+		} catch (SQLException e) {
+		   e.printStackTrace();
+		   result = false;
+		} catch (ClassNotFoundException e) {
+		   e.printStackTrace();
+		   result = false;
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(stmt2 != null)
+					stmt2.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;		
 	}
 	
 	public static int getNoOfRecords() {

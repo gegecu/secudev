@@ -43,6 +43,7 @@
 				</c:when>
 				<c:when test="${status==false}">
 					Post Failed. <br>
+					${prompt}
 				</c:when>
 			</c:choose>	
 		</h1>
@@ -51,7 +52,7 @@
 	<form action="login_landing" method="POST">
 		Post: <br>
 		<textarea id="post" name="post" type="text" rows="4" cols="50" required></textarea><br>
-		<button type=submit>Submit</button>
+		<button type=submit>submit</button>
 	</form>
 	
 	<br>
@@ -68,21 +69,25 @@
 			
             <tr>
                 <td>
-                	<a href="user_profile?username=${post.getUsername()}">${post.getFirstname()}</a> <br>
-                	<a href="user_profile?username=${post.getUsername()}">${post.getUsername()}</a> <br>
-                	${post.getUserJoin()}
+                	<a href="user_profile?username=${post.getInfo("username")}">${post.getInfo("username")}</a><br>
+                	<a href="user_profile?username=${post.getInfo("firstname")}">${post.getInfo("firstname")}</a><br>
+
 				</td>
 				
 				<td>
-					${post.getDate()} <br>
-					${post.getPost()} <br>
-					<c:if test="${post.getEditDate() != null}">
-						${post.getEditDate()}
+					${post.getInfo("postdate")} <br>
+					<div>
+						${post.getInfo("post")} 
+					</div>
+					<br>
+					<c:if test="${post.getInfo(\"editdate\") != null}">
+						${post.getInfo("editdate")}
+						<br>
 					</c:if>
 					
-					<c:if test="${post.getUsername()==sessionScope.user.getInfo(\"username\") || sessionScope.user.isAdmin()}">
-						edit
-						delete
+					<c:if test="${post.getInfo(\"username\")==sessionScope.user.getInfo(\"username\") || sessionScope.user.isAdmin()}">
+						<a href="post_profile?id=${post.getId()}">edit</a><br>
+						<a href="post_profile?id=${post.getId()}">delete</a><br>
 					</c:if>
 					 
 				</td>

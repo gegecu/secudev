@@ -60,7 +60,7 @@
 			Password: <input id="password" name="password" type="password" required><br> 
 			About me: <input id="description" name="description" type="text" required> <br>
 			
-			<button type=submit>Submit</button>
+			<button type=submit>submit</button>
 		</form>
 	</div>
 	
