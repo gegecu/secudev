@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
+
 import database.LogDAO;
 import database.UserDAO;
 import utility.DateParser;
@@ -169,7 +172,7 @@ public class PublicRegistration extends HttpServlet {
 			user.setInfo("sex", sex);
 			user.setInfo("salutation", salutation);
 			user.setInfo("birthday", birthdate.toString());
-			user.setInfo("description", description);
+			user.setInfo("description", Jsoup.clean(description, Whitelist.relaxed()));
 			user.setInfo("username", username);
 			user.setInfo("password", password);
 			

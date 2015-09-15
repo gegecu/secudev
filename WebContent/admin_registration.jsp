@@ -71,7 +71,7 @@
 	</div>
 	
 	<c:if test="${sessionScope.user!=null}">
-		<form action="logout" method="GET">
+		<form action="logout" method="POST">
 		<button type=submit>logout</button>
 		</form>
 	</c:if>

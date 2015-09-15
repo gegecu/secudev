@@ -40,17 +40,10 @@ public class UserProfile extends HttpServlet {
 			
 			
 			System.out.println(username);
-			
-			if(username.equals(user.getInfo("username"))){
 				
-				response.sendRedirect("login_landing");
-				
-			}else {
-				
-				request.setAttribute("user", UserDAO.getUser(username));
-				request.getRequestDispatcher("user_profile.jsp").forward(request, response);
+			request.setAttribute("user", UserDAO.getUser(username));
+			request.getRequestDispatcher("user_profile.jsp").forward(request, response);
 					
-			}
 		}
 		else {
 			response.sendRedirect("login");
