@@ -159,6 +159,14 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		}
 		
+		if(description.length() == 0) {
+			prompt += "About me is empty. ";
+			invalid = true;
+		} else if (description.length() > 100) {
+			prompt += "About me is too long. ";
+			invalid = true;
+		}
+		
 		
 		if(invalid) {
 			session.setAttribute(this.prompt, prompt);

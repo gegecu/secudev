@@ -103,9 +103,12 @@ public class LoginLanding extends HttpServlet {
 			//String post = processor.process(request.getParameter("post"));
 			//System.out.println(post);
 			if(post.length() == 0) {
-				prompt = "Post is empty";
+				prompt = "Post is empty. ";
 				invalid = true;
-			} 
+			} else if (post.length() > 65000) {
+				prompt = "Post is too long. ";
+				invalid = true;
+			}
 			
 			if(invalid) {
 				session.setAttribute(this.prompt, prompt);
