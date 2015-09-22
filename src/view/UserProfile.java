@@ -1,4 +1,4 @@
-package model;
+package view;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,7 +9,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import model.User;
 import database.UserDAO;
 
 /**
@@ -33,13 +35,11 @@ public class UserProfile extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
-		User user = (User) request.getSession().getAttribute("user");
+		HttpSession session = request.getSession();
+		User loginUser = (User)request.getSession().getAttribute("user");
 		
-		if(user != null) {
+		if(loginUser != null) {
 			String username = request.getParameter("username");
-			
-			
-			System.out.println(username);
 				
 			request.setAttribute("user", UserDAO.getUser(username));
 			request.getRequestDispatcher("user_profile.jsp").forward(request, response);

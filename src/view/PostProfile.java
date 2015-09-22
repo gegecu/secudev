@@ -1,4 +1,4 @@
-package model;
+package view;
 
 import java.io.IOException;
 
@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import model.Post;
+import model.User;
 import utility.IPChecker;
 import database.DAO;
 import database.LogDAO;
@@ -82,67 +84,6 @@ public class PostProfile extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		HttpSession session = request.getSession();
-		User user = (User)session.getAttribute("user");
-		
-		if(user == null) {
-			response.sendRedirect("login");
-			return;
-		}
-		
-		int id = 0;
-		try {
-			id = Integer.parseInt(request.getParameter("id"));
-		}catch(NumberFormatException e) {
-			e.printStackTrace();
-			response.sendRedirect("login_landing");
-		}
-		
-		if(id == 0 || !(user.isAdmin() || user.getInfo("username").equals(PostDAO.getPost(id).getInfo("username")))) {
-			response.sendRedirect("login_landing");
-			return;
-		}
-		
-		else {
-			if(request.getParameter("type").equals("edit"))
-				editPost(request, response, session, id);
-			else if(request.getParameter("type").equals("delete")) {
-				PostDAO.delete(id);
-				response.sendRedirect("login_landing");
-			}
-		}
-	}
-	
-	private void editPost(HttpServletRequest request, HttpServletResponse response, HttpSession session, int id) throws ServletException,  IOException {
-		
-		String prompt = "";
-		boolean invalid = false;
-
-		String postData = request.getParameter("post");
-		
-		if(postData.length() == 0) {
-			prompt += "Post is empty. ";
-			invalid = true;
-		}
-				
-		if(invalid) {
-			session.setAttribute(this.prompt, prompt);
-			session.setAttribute(this.status, false);
-			//LogDAO.addLog(prompt + "-Public Registration", IPChecker.getClientIpAddress(request));
-			response.sendRedirect("post_profile?id=" + id);
-		} else {
-			Post post = new Post();
-			post.setId(id);
-			post.setInfo("post", postData);
-					
-			if(PostDAO.editPost(post)) {
-				session.setAttribute(this.status, true);
-			} else {
-				session.setAttribute(this.status, false);
-			}
-					
-			response.sendRedirect("post_profile?id=" + id);
-			}
 	}
 
 }

@@ -1,4 +1,4 @@
-package model;
+package controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import model.User;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
@@ -42,8 +44,9 @@ public class PublicRegistration extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		HttpSession session = request.getSession();
+		User loginUser = (User)session.getAttribute("user");
 		
-		if(((User)session.getAttribute("user")) == null) {
+		if(loginUser == null) {
 			
 			request.setAttribute(this.prompt, session.getAttribute(this.prompt));
 			session.removeAttribute(this.prompt);
@@ -79,6 +82,7 @@ public class PublicRegistration extends HttpServlet {
 		String prompt = "";
 		boolean invalid = false;
 		
+		//firstname check
 		if(firstname.length()==0){
 			prompt += "First name is empty. ";
 			invalid = true;
@@ -90,7 +94,7 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		} 
 		
-		
+		//lastname check
 		if(lastname.length()==0){
 			prompt += "Last name is empty. ";
 			invalid = true;
@@ -102,6 +106,7 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		} 
 		
+		//gender check
 		if(sex == null || sex.length() == 0){
 			prompt += "Gender is empty. ";
 			invalid = true;
@@ -110,11 +115,13 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		}
 		
+		//salutation check
 		if(salutation == null || salutation.length() == 0){
 			prompt += "Salutation is empty. ";
 			invalid = true;
 		}
 		
+		//gender-salutation check
 		if(!(sex.equals("Male") && (salutation.equals("Mr") || salutation.equals("Sir") || salutation.equals("Senior") || salutation.equals("Count"))
 				|| (sex.equals("Female") && (salutation.equals("Miss") || salutation.equals("Ms") || salutation.equals("Mrs") || salutation.equals("Madame")
 						|| salutation.equals("Majesty") || salutation.equals("Seniora"))))) {
@@ -122,13 +129,14 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		}
 		
+		//birthday check
 		LocalDate birthdate = null;
 		if(birthday != null) {
 			birthdate = DateParser.parseStringToDate(birthday);
 		}
 		
 		if(birthdate == null) {
-			prompt += "No birthday chosen. ";
+			prompt += "No birthday chosen or in wrong format. ";
 			invalid = true;
 		} else if (birthdate.isAfter(LocalDate.now())) {
 			prompt += "Birthday is invalid. ";
@@ -138,7 +146,7 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		} 
 		
-		
+		//username check
 		if(username.length()==0) {
 			prompt += "Username is empty. ";
 			invalid = true;
@@ -150,15 +158,19 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		} 
 		
-		
+		//password check
 		if(password.length()==0) {
 			prompt += "Password is empty. ";
 			invalid = true;
 		} else if(password.length() > 50) {
 			prompt += "Password is over 50 characters. ";
 			invalid = true;
+		} else if (!(username.matches("^[^ ]*$"))) {
+			prompt += "Password contains spaces. ";
+			invalid = true;
 		}
 		
+		//aboutme check
 		if(description.length() == 0) {
 			prompt += "About me is empty. ";
 			invalid = true;
@@ -167,13 +179,12 @@ public class PublicRegistration extends HttpServlet {
 			invalid = true;
 		}
 		
-		
 		if(invalid) {
 			session.setAttribute(this.prompt, prompt);
 			session.setAttribute(this.status, false);
-			LogDAO.addLog(prompt + "-Public Registration", IPChecker.getClientIpAddress(request));
-			response.sendRedirect("public_registration");
-		} else {
+			//LogDAO.addLog(prompt + "-Public Registration", IPChecker.getClientIpAddress(request));
+		}
+		else {
 			User user = new User();
 			user.setInfo("firstname", firstname);
 			user.setInfo("lastname", lastname);
@@ -183,15 +194,15 @@ public class PublicRegistration extends HttpServlet {
 			user.setInfo("description", Jsoup.clean(description, Whitelist.relaxed()));
 			user.setInfo("username", username);
 			user.setInfo("password", password);
+			user.setAdmin(false);
 			
 			if(UserDAO.register(user)) {
 				session.setAttribute(this.status, true);
 			} else {
 				session.setAttribute(this.status, false);
 			}
-			
-			response.sendRedirect("public_registration");
 		}
+		response.sendRedirect("public_registration");
 	}
 
 }

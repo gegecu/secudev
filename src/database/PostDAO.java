@@ -16,7 +16,7 @@ import model.User;
 public class PostDAO extends DAO{
 
 	public static boolean addPost(Post post) {
-		String query = "INSERT INTO `secudev`.`post` (`post`, `username`, `postdate`) VALUES (?, ?, ?)";
+		String query = "INSERT INTO `secudev`.`post` (`post`, `username`) VALUES (?, ?)";
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		
@@ -28,7 +28,6 @@ public class PostDAO extends DAO{
 			
 			stmt.setString(1, post.getInfo("post"));
 			stmt.setString(2, post.getInfo("username"));
-			stmt.setString(3, post.getInfo("postdate"));
 
 			stmt.executeUpdate();
 			

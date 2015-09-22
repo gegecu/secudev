@@ -7,6 +7,23 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
 </head>
+
+<style>
+	div.scrollable {
+	    width: 100%;
+	    height: 150px;
+	    margin: 0;
+	    padding: 0;
+	    overflow: auto;
+	    border: 1px solid black;
+	}
+	
+	textarea { 
+		width: 100%;
+		height: 150px;
+	}
+</style>
+
 <body>
 	<div>
 		<h1>
@@ -25,19 +42,19 @@
 	</div>
 
 	Post: <br>
-	<div style="border: 1px solid black;">
+	<div class="scrollable">
 		${post.getInfo("post")} <br>
 	</div>
 	
 	<div>
-		<form action="post_profile?id=${post.getId()}&type=delete" method="POST">
+		<form action="delete_post?id=${post.getId()}" method="POST">
 			<button type=submit>delete</button>
 		</form>
 	</div>
 	
 	<br>
 	<div>
-		<form action="post_profile?id=${post.getId()}&type=edit" method="POST">
+		<form action="edit_post?id=${post.getId()}" method="POST">
 			Post: <br>
 			<textarea id="post" name="post" type="text" rows="4" cols="50" required></textarea><br>
 			<button type=submit>submit</button>

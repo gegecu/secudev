@@ -10,7 +10,7 @@
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="/resources/demos/style.css">
 
 </head>
@@ -32,34 +32,8 @@
 	</div>
 
 	<div>
-		<form action="public_registration" method="POST">
-			
-			Firstname: <input id="firstname" name="firstname" type="text" required><br>
-			Lastname: <input id="lastname" name="lastname" type="text" required><br>
-			
-			<div>
-			Gender:
-				<select id="sex" name="sex" required>
-					<option value="Male">Male</option>
-					<option value="Female">Female</option>
-				</select>
-			</div>
-			
-			<div>
-			Salutation:
-				<select id="salutations" name="salutations" required>
-				</select>
-			</div>
-			
-			<div>
-			Birthdate:
-				<input type="date" id="birthday" name="birthday" required> 
-			</div>
-			
-			Username: <input id="username" name="username" type="text" required><br>
-			Password: <input id="password" name="password" type="password" required><br> 
-			About me: <input id="description" name="description" type="text" required> <br>
-			
+		<form action="public_registration" method="POST" onsubmit="return validate()">
+			<%@ include file="form.jsp"%>
 			<button type=submit>submit</button>
 		</form>
 	</div>
@@ -67,50 +41,4 @@
 	 <button onclick="location.href='login'">login</button>
 	 
 </body>
-
-<script>
-	$(document).ready(function() {
-		$( "#birthday" ).datepicker();
-		
-		salutationTrigger();
-
-		$("#sex").change(function() {
-			
-			salutationTrigger();
-
-		});
-	});
-	
-	function salutationTrigger() {
-		
-		var $selectDropdown = 
-		      $("#salutations")
-		        .empty()
-		        .html(' ');
-	    
-	    // clear contents
-	    
-		
-	    var sex = $("#sex").val();
-	    
-	    
-	    var salutationMale = ["Mr", "Sir", "Senior", "Count"];
-	    var salutationFemale = ["Miss", "Ms", "Mrs", "Madame", "Majesty", "Seniora"];
-	    
-	    if(sex == "Male") {
-	    	for(var i = 0; i < salutationMale.length; i++) {
-	    		$("#salutations").append($("<option></option>").attr("value",salutationMale[i]).text(salutationMale[i]));
-	    	}
-	    } else {
-	    	for(var i = 0; i < salutationMale.length; i++) {
-	    		$("#salutations").append($("<option></option>").attr("value",salutationFemale[i]).text(salutationFemale[i]));
-	    	}
-	    }
-	    
-	    $selectDropdown.trigger('contentChanged');
-	}
-	
-
-	
-</script>
 </html>

@@ -1,4 +1,4 @@
-package model;
+package view;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import model.Post;
+import model.User;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -92,51 +95,6 @@ public class LoginLanding extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
-		String prompt = "";
-		boolean invalid = false;
-		
-		HttpSession session = request.getSession();
-		
-		if(session.getAttribute("user") != null) {
-			String post = Jsoup.clean(request.getParameter("post"), Whitelist.relaxed());
-			//String post = processor.process(request.getParameter("post"));
-			//System.out.println(post);
-			if(post.length() == 0) {
-				prompt = "Post is empty. ";
-				invalid = true;
-			} else if (post.length() > 65000) {
-				prompt = "Post is too long. ";
-				invalid = true;
-			}
-			
-			if(invalid) {
-				session.setAttribute(this.prompt, prompt);
-				session.setAttribute(this.status, false);
-				LogDAO.addLog(prompt + "-Post", IPChecker.getClientIpAddress(request));
-				response.sendRedirect("login_landing");
-			} 
-			else {
-				Post p = new Post();
-				p.setInfo("post", post);
-				p.setInfo("postdate", new Date(Calendar.getInstance().getTime().getTime()).toString());
-				p.setInfo("username", ((User)session.getAttribute("user")).getInfo("username"));
-				if(PostDAO.addPost(p)) {
-					session.setAttribute(this.status, true);
-				} 
-				else {
-					session.setAttribute(this.status, false);
-				}
-			}
-			
-			response.sendRedirect("login_landing");
-			
-		} 
-		else {
-			LogDAO.addLog("Invading login landing page", IPChecker.getClientIpAddress(request));
-			response.sendRedirect("login");
-		}
-		
 	}
 
 }

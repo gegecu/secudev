@@ -1,4 +1,4 @@
-package model;
+package controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -11,16 +11,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import model.User;
+
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
+
 import utility.DateParser;
 import utility.IPChecker;
 import database.LogDAO;
 import database.UserDAO;
 
 /**
- * Servlet implementation class edit
+ * Servlet implementation class AdminRegistration
  */
-@WebServlet("/edit")
-public class Edit extends HttpServlet {
+@WebServlet("/admin_registration")
+public class AdminRegistration extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final String prompt = "prompt";
 	private final String status = "status";
@@ -28,7 +33,7 @@ public class Edit extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Edit() {
+    public AdminRegistration() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -39,21 +44,24 @@ public class Edit extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		HttpSession session = request.getSession();
-		User user = (User)session.getAttribute("user");
+		User loginUser = (User)session.getAttribute("user");
 		
-		if(user == null) {
-			LogDAO.addLog("Invading Edit Page", IPChecker.getClientIpAddress(request));
+		if(loginUser == null) {
+			//LogDAO.addLog("Invading Admin Page", IPChecker.getClientIpAddress(request));
 			response.sendRedirect("login");
-		} else {
-			request.setAttribute("user", user);
-			
+		}
+		else if (!(loginUser.isAdmin())) {
+			//LogDAO.addLog("Invading Admin Page", IPChecker.getClientIpAddress(request));
+			response.sendRedirect("login_landing");
+		}
+		else {
 			request.setAttribute(this.prompt, session.getAttribute(this.prompt));
 			session.removeAttribute(this.prompt);
 			
 			request.setAttribute(this.status, session.getAttribute(this.status));
 			session.removeAttribute(this.status);
 			
-			request.getRequestDispatcher("edit.jsp").forward(request, response);
+			request.getRequestDispatcher("admin_registration.jsp").forward(request, response);
 		}
 	}
 
@@ -62,10 +70,20 @@ public class Edit extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		HttpSession session = request.getSession();
-		//User user = (User)session.getAttribute("user");
 		
-		if(session.getAttribute("user") != null) {
+		HttpSession session = request.getSession();
+		User loginUser = (User)session.getAttribute("user");
+		
+		if(loginUser == null) {
+			//LogDAO.addLog("Invading Admin Page", IPChecker.getClientIpAddress(request));
+			response.sendRedirect("login");
+		}
+		else if (!(loginUser.isAdmin())) {
+			//LogDAO.addLog("Invading Admin Page", IPChecker.getClientIpAddress(request));
+			response.sendRedirect("login_landing");
+		}
+		else {
+
 			String firstname = request.getParameter("firstname");
 			String lastname = request.getParameter("lastname");
 			String sex = request.getParameter("sex");
@@ -75,22 +93,23 @@ public class Edit extends HttpServlet {
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			String access = request.getParameter("access");
+			
 			String prompt = "";
 			boolean invalid = false;
 			
+			//firstname check
 			if(firstname.length()==0){
 				prompt += "First name is empty. ";
 				invalid = true;
-			} else if(firstname.length() > 50) {
+			} else if (firstname.length() > 50) {
 				prompt += "First name is over 50 characters. ";
 				invalid = true;
-			}
-			else if(!(firstname.matches("^[A-Za-z\\s]{1,}[A-Za-z\\s]{0,}$"))) {
+			} else if(!(firstname.matches("^[A-Za-z\\s]{1,}[A-Za-z\\s]{0,}$"))) {
 				prompt += "First name contains special character. ";
 				invalid = true;
 			} 
 			
-			
+			//lastname check
 			if(lastname.length()==0){
 				prompt += "Last name is empty. ";
 				invalid = true;
@@ -102,6 +121,7 @@ public class Edit extends HttpServlet {
 				invalid = true;
 			} 
 			
+			//gender check
 			if(sex == null || sex.length() == 0){
 				prompt += "Gender is empty. ";
 				invalid = true;
@@ -110,11 +130,13 @@ public class Edit extends HttpServlet {
 				invalid = true;
 			}
 			
+			//salutation check
 			if(salutation == null || salutation.length() == 0){
 				prompt += "Salutation is empty. ";
 				invalid = true;
 			}
 			
+			//gender-salutation check
 			if(!(sex.equals("Male") && (salutation.equals("Mr") || salutation.equals("Sir") || salutation.equals("Senior") || salutation.equals("Count"))
 					|| (sex.equals("Female") && (salutation.equals("Miss") || salutation.equals("Ms") || salutation.equals("Mrs") || salutation.equals("Madame")
 							|| salutation.equals("Majesty") || salutation.equals("Seniora"))))) {
@@ -122,13 +144,14 @@ public class Edit extends HttpServlet {
 				invalid = true;
 			}
 			
+			//birthday check
 			LocalDate birthdate = null;
 			if(birthday != null) {
 				birthdate = DateParser.parseStringToDate(birthday);
 			}
 			
 			if(birthdate == null) {
-				prompt += "No birthday chosen. ";
+				prompt += "No birthday chosen or invalid format. ";
 				invalid = true;
 			} else if (birthdate.isAfter(LocalDate.now())) {
 				prompt += "Birthday is invalid. ";
@@ -138,39 +161,44 @@ public class Edit extends HttpServlet {
 				invalid = true;
 			} 
 			
-			
-			if(!username.equals(((User)session.getAttribute("user")).getInfo("username"))) {
-				prompt += "Username cannot be edited. ";
+			//username check
+			if(username.length()==0) {
+				prompt += "Username is empty. ";
 				invalid = true;
-			}
+			} else if(username.length() > 50) {
+				prompt += "Username is over 50 characters. ";
+				invalid = true;
+			} else if (!(username.matches("^[a-zA-Z0-9_]*$"))) {
+				prompt += "Username contains special character. ";
+				invalid = true;
+			} 
 			
-			
+			//password check
 			if(password.length()==0) {
 				prompt += "Password is empty. ";
 				invalid = true;
 			} else if(password.length() > 50) {
 				prompt += "Password is over 50 characters. ";
 				invalid = true;
+			} else if (!(password.matches("^[^ ]*$"))) {
+				prompt += "Passowrd contains spaces. ";
+				invalid = true;
 			}
 			
-			if(((User)session.getAttribute("user")).isAdmin() && (access == null || access.length() == 0)) {
+			//access check
+			if(access == null || access.length() == 0) {
 				prompt += "No access type. ";
 				invalid = true;
-			} else if(!((User)session.getAttribute("user")).isAdmin() && access != null) {
-				prompt += "Not authorized to set access type. ";
-				invalid = true;
-			}
-			else if(!(access.equals("Admin") || access.equals("User"))) {
+			} else if(!(access.equals("Admin") || access.equals("User"))) {
 				prompt += "Unknown access type. ";
 				invalid = true;
 			}
 			
-			
 			if(invalid) {
 				session.setAttribute(this.prompt, prompt);
 				session.setAttribute(this.status, false);
-				LogDAO.addLog(prompt + "-Edit", IPChecker.getClientIpAddress(request));
-				response.sendRedirect("edit");
+				//LogDAO.addLog(prompt, IPChecker.getClientIpAddress(request));
+				
 			} else {
 				User user = new User();
 				user.setInfo("firstname", firstname);
@@ -178,30 +206,23 @@ public class Edit extends HttpServlet {
 				user.setInfo("sex", sex);
 				user.setInfo("salutation", salutation);
 				user.setInfo("birthday", birthdate.toString());
-				user.setInfo("description", description);
+				user.setInfo("description", Jsoup.clean(description, Whitelist.relaxed()));
 				user.setInfo("username", username);
 				user.setInfo("password", password);
 				
 				if(access.equals("User")) {
 					user.setAdmin(false);
-				} else if(access.equals("Admin")) {
+				} else {
 					user.setAdmin(true);
 				}
-				
-				if(UserDAO.edit(user)) {
-					user.setInfo("birthday", DateParser.parseDateForDisplay(birthdate.toString()));
-					session.setAttribute("user", user);
+	
+				if(UserDAO.register(user)) {
 					session.setAttribute(this.status, true);
 				} else {
 					session.setAttribute(this.status, false);
 				}
-				
-				response.sendRedirect("edit");
 			}
-		}
-		else {
-			LogDAO.addLog("Invading Edit Page", IPChecker.getClientIpAddress(request));
-			response.sendRedirect("login");
+			response.sendRedirect("admin_registration");
 		}
 	}
 
