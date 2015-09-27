@@ -19,11 +19,11 @@
 			<c:choose>
 				<c:when test="${status==true}">
 					<script>
-						alert("Edit Successful");
+						alert("Successful");
 					</script>
 				</c:when>
 				<c:when test="${status==false}">
-					Edit Failed. <br>
+					Failed. <br>
 					${prompt}
 				</c:when>
 			</c:choose>	
@@ -45,7 +45,7 @@
 				</c:if>
 			</div>
 			
-			<button type=submit>submit</button>
+			<button type="submit">submit</button>
 		</form>
 	</div>
 	

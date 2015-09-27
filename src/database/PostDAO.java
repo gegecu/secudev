@@ -52,58 +52,58 @@ public class PostDAO extends DAO{
 		return true;
 	}
 	
-	public static List<Post> getPosts(int offset, int noOfRecords) {
-		List<Post> posts = new ArrayList<Post>();
-		
-		String query = " SELECT SQL_CALC_FOUND_ROWS `post`.postid, `post`.post, `post`.username, `post`.postdate, `post`.editeddate, `user`.firstname, `user`.joindate FROM `post` INNER JOIN" +
-						" `user` ON `post`.username = `user`.username" + " ORDER BY `post`.postdate DESC, `post`.postid DESC LIMIT " + offset + ", " + noOfRecords;
-		
-		System.out.println(query);
-		Connection connection = null;
-		PreparedStatement stmt = null;
-		try {
-			
-			connection  = getConnection();
-			stmt  = connection.prepareStatement(query);
-			ResultSet rs = stmt.executeQuery();
-			
-			while(rs.next()){
-				Post post = new Post();
-				post.setId(rs.getInt(1));
-				post.setInfo("post", rs.getString(2));
-				post.setInfo("username", rs.getString(3));
-				post.setInfo("postdate", rs.getString(4));
-				post.setInfo("editdate", rs.getString(5));
-				post.setInfo("firstname", rs.getString(6));
-				post.setInfo("userjoin", rs.getString(7));
-				posts.add(post);
-			}
-			
-			rs.close();
-			
-			rs = stmt.executeQuery("SELECT FOUND_ROWS()");
-            if(rs.next())
-                noOfRecords = rs.getInt(1);
-			
-			
-		} catch (SQLException e) {
-		   e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-		   e.printStackTrace();
-		}finally {
-			try {
-				if(stmt != null)
-					stmt.close();
-				if(connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return posts;
-	}
-	
+//	public static List<Post> getPosts(int offset, int noOfRecords) {
+//		List<Post> posts = new ArrayList<Post>();
+//		
+//		String query = " SELECT SQL_CALC_FOUND_ROWS `post`.postid, `post`.post, `post`.username, `post`.postdate, `post`.editeddate, `user`.firstname, `user`.joindate FROM `post` INNER JOIN" +
+//						" `user` ON `post`.username = `user`.username" + " ORDER BY `post`.postdate DESC, `post`.postid DESC LIMIT " + offset + ", " + noOfRecords;
+//		
+//		System.out.println(query);
+//		Connection connection = null;
+//		PreparedStatement stmt = null;
+//		try {
+//			
+//			connection  = getConnection();
+//			stmt  = connection.prepareStatement(query);
+//			ResultSet rs = stmt.executeQuery();
+//			
+//			while(rs.next()){
+//				Post post = new Post();
+//				post.setId(rs.getInt(1));
+//				post.setInfo("post", rs.getString(2));
+//				post.setInfo("username", rs.getString(3));
+//				post.setInfo("postdate", rs.getString(4));
+//				post.setInfo("editdate", rs.getString(5));
+//				post.setInfo("firstname", rs.getString(6));
+//				post.setInfo("userjoin", rs.getString(7));
+//				posts.add(post);
+//			}
+//			
+//			rs.close();
+//			
+//			rs = stmt.executeQuery("SELECT FOUND_ROWS()");
+//            if(rs.next())
+//                noOfRecords = rs.getInt(1);
+//			
+//			
+//		} catch (SQLException e) {
+//		   e.printStackTrace();
+//		} catch (ClassNotFoundException e) {
+//		   e.printStackTrace();
+//		}finally {
+//			try {
+//				if(stmt != null)
+//					stmt.close();
+//				if(connection != null)
+//					connection.close();
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		return posts;
+//	}
+//	
 	public static Post getPost(int id) {
 		
 		//List<Post> posts = new ArrayList<Post>();
@@ -243,10 +243,10 @@ public class PostDAO extends DAO{
 		return result;		
 	}
 	
-	public static int getNoOfRecords() {
+	public static int getNoOfRecords(List<String> values, String condition) {
 		//List<Post> posts = new ArrayList<Post>();
 		
-		String query = " SELECT COUNT(*) FROM `post`";
+		String query = " SELECT COUNT(*) FROM `secudev`.`post` " + condition;
 		
 		System.out.println(query);
 		Connection connection = null;
@@ -255,6 +255,14 @@ public class PostDAO extends DAO{
 			
 			connection  = getConnection();
 			stmt  = connection.prepareStatement(query);
+			
+			if(values != null) {
+				for(int i = 0; i < values.size(); i++) {
+					System.out.println(values.get(i));
+					stmt.setString(i+1, values.get(i));
+				}
+			}
+			
 			ResultSet rs = stmt.executeQuery();
 			
             if(rs.next())
@@ -278,4 +286,98 @@ public class PostDAO extends DAO{
 		
 		return 0;
     }
+	
+	public static List<Post> getPosts(int offset, int noOfRecords, List<String> values, String condition) {
+		List<Post> posts = new ArrayList<Post>();
+		
+		String query = " SELECT SQL_CALC_FOUND_ROWS `post`.postid, `post`.post, `post`.username, `post`.postdate, `post`.editeddate, `user`.firstname, `user`.joindate FROM `post` INNER JOIN" +
+						" `user` ON `post`.username = `user`.username " + condition + " ORDER BY `post`.postdate DESC, `post`.postid DESC LIMIT " + offset + ", " + noOfRecords;
+		
+		System.out.println(query);
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		try {
+			
+			connection  = getConnection();
+			stmt  = connection.prepareStatement(query);
+			
+			if(values != null) {
+				for(int i = 0; i < values.size(); i++) {
+					System.out.println(values.get(i));
+					stmt.setString(i+1, values.get(i));
+				}
+			}
+
+			ResultSet rs = stmt.executeQuery();
+
+			while(rs.next()){
+				Post post = new Post();
+				post.setId(rs.getInt(1));
+				post.setInfo("post", rs.getString(2));
+				post.setInfo("username", rs.getString(3));
+				post.setInfo("postdate", rs.getString(4));
+				post.setInfo("editdate", rs.getString(5));
+				post.setInfo("firstname", rs.getString(6));
+				post.setInfo("userjoin", rs.getString(7));
+				posts.add(post);
+			}
+			
+			rs.close();
+			
+			rs = stmt.executeQuery("SELECT FOUND_ROWS()");
+            if(rs.next())
+                noOfRecords = rs.getInt(1);
+			
+			
+		} catch (SQLException e) {
+		   e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+		   e.printStackTrace();
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return posts;
+	}
+	
+	public static boolean backupPost() {
+		long time = System.currentTimeMillis();
+		String query = "SELECT `post`.`username`, `post`.`postdate`, `post`.`post` INTO OUTFILE 'tmp/secudev/" + time + ".csv' FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\\n' FROM `secudev`.`post`";
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		
+		System.out.println(query);
+		try {
+			connection = getConnection();
+			connection.setAutoCommit(false);
+			stmt = connection.prepareStatement(query);
+			
+			stmt.executeQuery(query);
+			connection.commit();
+			
+		} catch (SQLException e) {
+		   e.printStackTrace();
+		   return false;
+		} catch (ClassNotFoundException e) {
+		   e.printStackTrace();
+		   return false;
+		}finally {
+			try {
+				if(stmt != null)
+					stmt.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+	}
 }

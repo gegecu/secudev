@@ -30,11 +30,11 @@
 			<c:choose>
 				<c:when test="${status==true}">
 					<script>
-						alert("Edit Successful");
+						alert("Successful");
 					</script>
 				</c:when>
 				<c:when test="${status==false}">
-					Edit Failed. <br>
+					Failed. <br>
 					${prompt}
 				</c:when>
 			</c:choose>	
@@ -57,7 +57,7 @@
 		<form action="edit_post?id=${post.getId()}" method="POST">
 			Post: <br>
 			<textarea id="post" name="post" type="text" rows="4" cols="50" required></textarea><br>
-			<button type=submit>submit</button>
+			<button type="submit">submit</button>
 		</form>
 	</div>
 	

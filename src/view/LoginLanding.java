@@ -72,8 +72,8 @@ public class LoginLanding extends HttpServlet {
 	        
 	        
 	        List<Post> posts = PostDAO.getPosts((page-1)*recordsPerPage,
-	                                 recordsPerPage);
-	        int noOfRecords = PostDAO.getNoOfRecords();
+	                                 recordsPerPage, null, "");
+	        int noOfRecords = PostDAO.getNoOfRecords(null, "");
 	        int noOfPages = (int) Math.ceil(noOfRecords * 1.0 / recordsPerPage);
 	        
 	        if(noOfPages<page)

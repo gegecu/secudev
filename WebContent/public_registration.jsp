@@ -20,11 +20,11 @@
 			<c:choose>
 				<c:when test="${status==true}">
 					<script>
-						alert("Registration Successful");
+						alert("Successful");
 					</script>
 				</c:when>
 				<c:when test="${status==false}">
-					Registation Failed. <br>
+					Failed. <br>
 					${prompt}
 				</c:when>
 			</c:choose>	
@@ -34,7 +34,7 @@
 	<div>
 		<form action="public_registration" method="POST" onsubmit="return validate()">
 			<%@ include file="form.jsp"%>
-			<button type=submit>submit</button>
+			<button type="submit">submit</button>
 		</form>
 	</div>
 	

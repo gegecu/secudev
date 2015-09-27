@@ -57,6 +57,7 @@ public class SubmitPost extends HttpServlet {
 		String prompt = "";
 		boolean invalid = false;
 		
+		
 		if(loginUser == null) {
 			//LogDAO.addLog("Invading login landing page", IPChecker.getClientIpAddress(request));
 			response.sendRedirect("login");
@@ -65,7 +66,7 @@ public class SubmitPost extends HttpServlet {
 		else {
 			String post = Jsoup.clean(request.getParameter("post"), Whitelist.relaxed());
 			//String post = processor.process(request.getParameter("post"));
-			//System.out.println(post);
+			
 			if(post.length() == 0) {
 				prompt = "Post is empty. ";
 				invalid = true;

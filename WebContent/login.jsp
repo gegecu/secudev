@@ -17,7 +17,7 @@
 	<div>
 		<h1>
 			<c:if test="${status==false}">
-					Login Failed. <br>
+					Failed. <br>
 			</c:if>
 		</h1>
 	</div>
@@ -26,7 +26,7 @@
 		<form action="login" method="POST">
 			Username: <input id="username" name="username" type="text" required><br>
 			Password: <input id="password" name="password" type="password" required><br> 
-			<button type=submit>submit</button>
+			<button type="submit">submit</button>
 		</form>
 	</div>
 </body>

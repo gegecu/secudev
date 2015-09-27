@@ -56,18 +56,5 @@
         </c:forEach>
 	</table>
 
-	<table border="1" cellpadding="5" cellspacing="5">
-		<tr>
-			<c:forEach begin="1" end="${noOfPages}" var="i">
-				<c:choose>
-					<c:when test="${currentPage eq i}">
-						<td>${i}</td>
-					</c:when>
-	                <c:otherwise>
-						<td><a href="login_landing?page=${i}">${i}</a></td>
-					</c:otherwise>
-				</c:choose>
-			</c:forEach>
-		</tr>
-	</table>
+	
 </div>

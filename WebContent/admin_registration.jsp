@@ -17,11 +17,11 @@
 			<c:choose>
 				<c:when test="${status==true}">
 					<script>
-						alert("Registration Successful");
+						alert("Successful");
 					</script>
 				</c:when>
 				<c:when test="${status==false}">
-					Registation Failed. <br>
+					Failed. <br>
 					${prompt}
 				</c:when>
 			</c:choose>	
@@ -41,13 +41,13 @@
 				</select>
 			</div>
 			
-			<button type=submit>submit</button>
+			<button type="submit">submit</button>
 		</form>
 	</div>
 	
 	<c:if test="${sessionScope.user!=null}">
 		<form action="logout" method="POST">
-		<button type=submit>logout</button>
+		<button type="submit">logout</button>
 		</form>
 	</c:if>
 	
